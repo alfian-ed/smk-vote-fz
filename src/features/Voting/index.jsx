@@ -1,76 +1,82 @@
-import React, { useContext, useEffect } from "react";
-import { useState } from "react";
-import Choice from "./Choice";
-import { IoArrowBack } from 'react-icons/io5'
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { KKPrimaryButton, KKSecondaryButton } from "../../components/KKButton";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import AuthContext from "../../AuthContext";
 
-const Voting = ({params}) => {
-    const {id} = useParams()
-    const {url} = useContext(AuthContext);  
-    const [selected, setSelected] = useState(0)
+const Voting = () => {
     const navigate = useNavigate()
-    const [calon, setCalon] = useState([])
+    const {id} = useParams()
+    const {token, url} = useContext(AuthContext)
+    const [votingData, setVotingData] = useState([])
+    const [voting, setVoting] = useState([])
+    const [simpan, setSimpan] = useState(null) //null adalah nilai default dari simpan
 
     useEffect(() => {
         (async () => {
-            const calons = axios.get()
+            const result = await axios.get(`${url}/periode/${id}`)
+                .then((response) => response.data)
+                setVotingData(result)
         })()
     }, [id])
 
-    const dataVote = {
-        choices: [
-            {
-                id: 1,
-                name: 'Alfian Faiz & Asyraf Salim Ibrahim',
-                img: 'https://dummyimage.com/80x80/000/fff.jpg&&text=1',
-                noUrut: '01',
-                calonKetua: 'Alfian Faiz',
-                calonWakil: 'Asyraf Salim Ibrahim'
-            },
-            {
-                id: 2,
-                name: 'Vidiyaningsih & Asyraf Salim Ibrahim',
-                img: 'https://dummyimage.com/80x80/000/fff.jpg&&text=2',
-                noUrut: '01',
-                calonKetua: 'Vidiyaningsih',
-                calonWakil: 'Asyraf Salim Ibrahim'
-            }
-        ]
+    useEffect(() => {
+        (async () => {
+            const result = await axios.get(`${url}/calon/periode/${id}`, {
+                headers: {
+                    "Authorization": "bearer " + token
+                }
+            })
+                .then((response) => response.data)
+            setVoting(result)
+        })()
+    }, [id])
+
+    const cobaSimpan = (id) => {
+        setSimpan(id)
     }
 
-    const submit = () => {
-        navigate('success')
+    const sendVote = async () => {
+        const result = await axios.post(url + '/vote', {
+            pilihanId: simpan,
+            periodeId: votingData.id
+        }, {headers: {"Authorization": "bearer " + token}})
+
+        if (result.status == 200) {
+            navigate("/sukses")
+        } else {
+            alert("Mohon maaf, voting anda tidak terkirim. Mohon ulangi. ")
+        }
     }
 
-    return (
-        <div className="flex flex-col h-full">
-            <div className="flex items-center gap-2 mb-5">
-                <IoArrowBack size={20} onClick={() => { navigate('..')}} />
-                <h1 className=""> Pemilihan Ketua Osis</h1>
+    const goToSukses = async () =>{
+        if (simpan===null){
+            alert('Pilih salah satu calon terlebih dahulu')
+        } else {
+            console.log(simpan)
+            await sendVote()
+        }
+    }
+    
+    return(
+        <div className="">
+            <h1 className="font-bold text-center mt-5 text-3xl">{votingData.name}</h1>
+            <p className="text-center mb-2">Klik gambar kandidat pilihan anda <br /> untuk memberi voting</p>
+            <div className="flex-row md:flex">
+                {voting.map(c => (
+                    <img 
+                        src={c.photo} 
+                        key={c.id}
+                        onClick={() => cobaSimpan(c.id)}
+                        className={`rounded-3xl pb-1 mx-auto border-4 ${simpan == c.id ? 'border-yellow-700 shadow-lg opacity-100' : 'opacity-90'}  bg-primary`}
+                        />
+                ))}
             </div>
-
-            {dataVote.choices.map(c => (
-                <Choice data={c} key={c.id} selected={selected} onClick={setSelected} />
-            ))}
-
-            {selected == 0 ? '' : (
-                <div className="card text-center h-full flex flex-col">
-                    <div className="h-full">
-                        <span>Anda memilih</span>
-                        <h3>Calon No. 0{selected}</h3>
-                        <img src={`https://dummyimage.com/250x200/000/fff.jpg&&text=${selected}`} className="w-[250px] mx-auto" />
-                    </div>
-
-                    <div className="w-full flex gap-2">
-                        <KKSecondaryButton isBlock={true} onClick={() => setSelected(0)}>Batal</KKSecondaryButton>
-                        <KKPrimaryButton isBlock={true} onClick={() => submit()}>Konfirmasi</KKPrimaryButton>
-                    </div>
-                </div>
-            )}
+            <button 
+                className="bg-secondary text-white mt-5 mx-auto px-14 py-3 rounded-xl md:display: block" 
+                onClick={goToSukses}>Kirim Vote</button>
         </div>
     )
 }
 
-export default Voting
+export default Voting

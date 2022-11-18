@@ -6,6 +6,7 @@ import { GoogleLogin } from 'react-google-login'
 import { gapi } from 'gapi-script'
 import axios from "axios";
 import AuthContext from "../../AuthContext";
+import logo from "./logo.png"
 
 
 const Login = () => {
@@ -26,7 +27,7 @@ const Login = () => {
 
     useEffect(() => {
         if (token != '') {
-            submit()
+            navigate('/')
         }
     }, [token])
 
@@ -35,23 +36,17 @@ const Login = () => {
         setEmail(res.profileObj.email)
         setLoginMsg("OAuth Success, mencoba login ke server popapp")
     };
+
     const onFailure = (err) => {
         console.log('failed:', err);
     };
 
-    const submit = () => {
-        navigate("/")
-    }
-
-    const goToVoting = () => {
-        navigate('/menu')
-    }
 
 
     return (
         <>
             <div id="login" className="mt-20 text-center mx-auto md:rounded-2xl md:mt-20 md:bg-slate-200 md:p-14 md:w-96">
-            <img src="src/features/Login/logo.png" alt="Logo" className="mx-auto mt-20 w-72 md:mt-0"/>
+            <img src={logo} alt="Logo" className="mx-auto mt-20 w-72 md:mt-0"/>
                 <h1 className="text-center  font-bold text-3xl mt-10">LOGIN</h1>
 
                 <GoogleLogin
@@ -60,7 +55,7 @@ const Login = () => {
                     onSuccess={onSuccess}
                     onFailure={onFailure}
                     cookiePolicy={'single_host_origin'}
-                    isSignedIn={true}
+                    isSignedIn={false}
                     render={renderProp => (
                         <div className="mt-10">
                             <button {...renderProp} className="inline-flex bg-button hover:bg-teal-500 p-3 rounded-xl"> <BsGoogle size={13} className="mt-1 mr-1"/>Klik disini untuk login</button>                   

@@ -1,24 +1,18 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createHashRouter } from "react-router-dom";
 import AuthProvider from "./AuthProvider";
 import AlternativeLogin from "./features/AlternativeLogin";
 import App from "./features/App";
 import { ErrorPage } from "./features/ErrorPages";
 import HalHasil from "./features/Hal-Hasil";
-import Menu from "./features/Menu";
 import Login from "./features/Login";
-import PilihVote from "./features/PilihVote";
-import Sukses from "./features/Sukses";
-import VotingOsis from "./features/VoteOsis";
+import Menu from "./features/Menu";
 import Voting from "./features/Voting";
+import Sukses from "./features/Sukses";
+// import Voting from "./features/Voting";
 import VotingPramuka from "./features/VotingPramuka";
-import VotingOsis3 from "./features/VoteOsis/Arun";
-import VotingOsis6 from "./features/VoteOsis/Dela";
-import VotingOsis8 from "./features/VoteOsis/putra";
-import VotingOsis2 from "./features/VoteOsis/Alfa";
-import VotingOsis1 from "./features/VoteOsis/index";
 
 
-const routes = createBrowserRouter([
+const routes = createHashRouter([
     {
         path: '/',
         element: 
@@ -29,7 +23,17 @@ const routes = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <PilihVote />
+                element: <Menu />
+            },
+            {
+                path: '/voting/:id',
+                element: 
+                    <Voting />
+            },
+            {
+                path: '/sukses',
+                element: 
+                    <Sukses />
             },
             {
                 path: '/vote/:id',
@@ -56,24 +60,10 @@ const routes = createBrowserRouter([
             </AuthProvider>
     },
     {
-        path: '/menu',
-        element: 
-            <AuthProvider>
-                <Menu />
-            </AuthProvider>
-    },
-    {
         path: '/dev/votingpramuka',
         element: 
             <AuthProvider>
                 <VotingPramuka />
-            </AuthProvider>
-    },
-    {
-        path: '/voting/:id',
-        element: 
-            <AuthProvider>
-                <VotingOsis6 />
             </AuthProvider>
     },
     // {
@@ -83,13 +73,6 @@ const routes = createBrowserRouter([
     //             <VotingOsis6 />
     //         </AuthProvider>
     // },
-    {
-        path: '/sukses',
-        element: 
-            <AuthProvider>
-                <Sukses />
-            </AuthProvider>
-    },
     {
         path: '/dev/hasil',
         element: 

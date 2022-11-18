@@ -6,8 +6,9 @@ import AuthContext from "./AuthContext"
 const AuthProvider = ({children, isProtected = false}) => {
     const [token, setToken] = useState('')
     const [email, setEmail] = useState('')
-    const [name, setName] = useState('')
-    const url = 'http://localhost:7153/api'
+    const [loginResult, setLogin] = useState(null)
+    // const url = 'https://vote-backend.greenfield-26de5c7e.eastasia.azurecontainerapps.io/api'
+    const url = 'http://localhost:5203/api'
     const navigate = useNavigate()
 
     const setPresistedToken = (token) =>{
@@ -22,6 +23,7 @@ const AuthProvider = ({children, isProtected = false}) => {
                 .then(res => {
                     return res.data
                 })
+                setLogin(login)
                 setToken(login.token)
             }
         })()
@@ -32,11 +34,10 @@ const AuthProvider = ({children, isProtected = false}) => {
             navigate('/login')
         }
     })
-    console.log(token)
 
     return (
         <AuthContext.Provider value={{
-            email, setEmail, name, token, url
+            email, setEmail, loginResult, token, url
         }}>{children}</AuthContext.Provider>
     )
 }
